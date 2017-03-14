@@ -1,17 +1,17 @@
 import React, {Component} from 'react'
 import {
-    Row,
-    Col,
     Tabs,
     Card,
     Upload,
     Icon,
     Modal
 } from 'antd'
-import axios from 'axios'
+
 import {Link} from 'react-router'
+
+import axios from 'axios'
 const TabPane = Tabs.TabPane
-class UserCenter extends Component {
+class MobileUserCenter extends Component {
     constructor (props) {
         super(props)
         this.state ={
@@ -27,7 +27,7 @@ class UserCenter extends Component {
             }]
         }
     }
-    componentWillMount () {
+    componentDidMount () {
         const userId = localStorage.userId
         // 获取收集列表
         let url = `http://newsapi.gugujiankong.com/Handler.ashx?action=getuc&userid=${userId}`
@@ -69,20 +69,23 @@ class UserCenter extends Component {
 
     handleChange = ({ fileList }) => this.setState({ fileList })
 
-
     render() {
         const {collections, comments} = this.state
-        const collectionList = collections.map((item, index) =>(
+        const collectionList = collections.length
+        ?  collections.map((item, index) =>(
             <Card key={index} title={item.uniquekey} extra={<Link to={`/news_detail/${item.uniquekey}`} >查看</Link>} >
                 <p>{item.title}</p>
             </Card>
         ))
+        : '您还没有收藏任何的新闻， 快去收藏一些新闻吧.'
 
-        const commentList = comments.map((item, index) =>(
+        const commentList = comments.length
+        ? comments.map((item, index) =>(
             <Card key={index} title={`于 ${item.dataTime} 评论了文章 ${item.uniquekey}`} extra={<Link to={`/news_detail/${item.uniquekey}`} >查看</Link>} >
                 <p>{item.content}</p>
             </Card>
         ))
+        : '您还没有发表过任何评论。'
 
         // 上传相关
         const { previewVisible, previewImage, fileList } = this.state;
@@ -95,39 +98,33 @@ class UserCenter extends Component {
 
         return (
             <div>
-                <Row>
-                    <Col span={1}></Col>
-                    <Col span={22}>
-                        <Tabs>
-                            <TabPane tab="我的收藏列表" key="1">
-                                {collectionList}
-                            </TabPane>
-                            <TabPane tab="我的评论列表" key="2">
-                                {commentList}
-                            </TabPane>
-                            <TabPane tab="头像设置" key="3">
+                <Tabs>
+                    <TabPane tab="我的收藏列表" key="1">
+                        {collectionList}
+                    </TabPane>
+                    <TabPane tab="我的评论列表" key="2">
+                        {commentList}
+                    </TabPane>
+                    <TabPane tab="头像设置" key="3">
 
-                                <Upload
-                                    action="http://localhost:3000/posts/"
-                                    listType="picture-card"
-                                    fileList={fileList}
-                                    onPreview={this.handlePreview}
-                                    onChange={this.handleChange}>
-                                    {uploadButton}
-                                </Upload>
+                        <Upload
+                            action="http://localhost:3000/posts/"
+                            listType="picture-card"
+                            fileList={fileList}
+                            onPreview={this.handlePreview}
+                            onChange={this.handleChange}>
+                            {uploadButton}
+                        </Upload>
 
-                                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                                    <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                                </Modal>
+                        <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                            <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                        </Modal>
 
-                            </TabPane>
-                        </Tabs>
-                    </Col>
-                    <Col span={1}></Col>
-                </Row>
+                    </TabPane>
+                </Tabs>
             </div>
         )
     }
 }
 
-export default UserCenter
+export default MobileUserCenter
